@@ -1,1 +1,1 @@
-# ivf-predictor
+Cloning and accessing locally instructions
