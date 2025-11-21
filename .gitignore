@@ -2,22 +2,17 @@
 __pycache__/
 *.pyc
 
-# Virtual environments 
+# Virtual environment
 .venv/
-**/.venv/
 
-# ML artifacts 
-*.joblib
-*.pth
-artifacts/
 
-# Large local datasets
+# Large files / datasets
 *.xlsx
 *.csv
 
-# VS Code settings
+# VS Code
 .vscode/
 
-# Logs / OS stuff
+# OS files
 *.log
 Thumbs.db
