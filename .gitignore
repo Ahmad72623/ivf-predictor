@@ -5,7 +5,12 @@ __pycache__/
 # Virtual environment
 .venv/
 
-# ML artifacts and Files
+# ML artifacts
+*.joblib
+*.pth
+artifacts/
+
+# Large files / datasets
 *.xlsx
 *.csv
 
