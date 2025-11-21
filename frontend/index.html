@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IVF Predictor – Random Forest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Chart.js for probability bar chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f7fb;
+      color: #16161d;
+    }
+    header {
+      background: #1f3c88;
+      color: #fff;
+      padding: 16px 24px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    main {
+      max-width: 960px;
+      margin: 24px auto;
+      padding: 24px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccd2e3;
+      font-family: inherit;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    small {
+      display: block;
+      margin-top: 2px;
+      color: #666;
+      font-size: 12px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: center;
+    }
+    .row > div {
+      flex: 1 1 220px;
+    }
+    button {
+      margin-top: 8px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: none;
+      background: #1f3c88;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #162a63;
+    }
+    #responseJson {
+      background: #0b1020;
+      color: #e6edf7;
+      padding: 16px;
+      border-radius: 12px;
+      font-family: "JetBrains Mono", Consolas, monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      margin-top: 16px;
+      max-height: 280px;
+    }
+    #summary {
+      margin-top: 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f0f5ff;
+      font-size: 14px;
+      white-space: pre-line;
+    }
+    #featureOrderBox {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #555;
+    }
+    canvas {
+      margin-top: 12px;
+      max-width: 100%;
+    }
+    h2 {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>IVF Predictor – Random Forest (Local)</h1>
+  </header>
+
+  <main>
+    <section>
+      <label for="backendUrl">Backend URL</label>
+      <input
+        type="text"
+        id="backendUrl"
+        value="http://127.0.0.1:8000"
+      />
+      <div id="featureOrderBox"></div>
+
+      <h2>Input features (normalized)</h2>
+      <small>
+        Class mapping: <b>0 = RIF</b>, <b>1 = RPL</b>, <b>2 = Both</b>.
+      </small>
+
+      <div class="grid">
+        <div>
+          <label for="f_adenomyosis">1. Adenomyosis (0 = N, 1 = Y)</label>
+          <input id="f_adenomyosis" type="text" placeholder="e.g., 0 or 1" />
+        </div>
+
+        <div>
+          <label for="f_endometriosis">2. Endometriosis (0 = N, 1 = Y)</label>
+          <input id="f_endometriosis" type="text" placeholder="e.g., 0 or 1" />
+        </div>
+
+        <div>
+          <label for="f_fibroids">3. Fibroids (0 = N, 1 = Y)</label>
+          <input id="f_fibroids" type="text" placeholder="e.g., 0 or 1" />
+        </div>
+
+        <div>
+          <label for="f_ga">4. GA (normalized)</label>
+          <input id="f_ga" type="text" placeholder="e.g., -0.8" />
+          <small>Use normalized GA (z-score) from your dataset.</small>
+        </div>
+
+        <div>
+          <label for="f_pcos">5. PCOS (0 = N, 1 = Y)</label>
+          <input id="f_pcos" type="text" placeholder="e.g., 0 or 1" />
+        </div>
+
+        <div>
+          <label for="f_th17">6. Th17 (CD4+)</label>
+          <input id="f_th17" type="text" placeholder="e.g., -0.4" />
+        </div>
+
+        <div>
+          <label for="f_th17_ifn_pos">7. Th17 (CD4+); IL17+/IFN+</label>
+          <input id="f_th17_ifn_pos" type="text" placeholder="e.g., -0.5" />
+        </div>
+
+        <div>
+          <label for="f_th17_ifn_neg">8. Th17 (CD4+); IL17+/IFN-</label>
+          <input id="f_th17_ifn_neg" type="text" placeholder="e.g., -0.6" />
+        </div>
+
+        <div>
+          <label for="f_treg_ratio">9. Th17TregRatio</label>
+          <input id="f_treg_ratio" type="text" placeholder="e.g., -0.7" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>
+            <input type="checkbox" id="returnProba" checked />
+            return_proba
+          </label>
+        </div>
+        <div>
+          <button id="predictBtn">Predict</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="summary" style="display:none;"></section>
+
+    <section>
+      <canvas id="probaChart"></canvas>
+    </section>
+
+    <section>
+      <h3>Raw Response</h3>
+      <pre id="responseJson">{}</pre>
+    </section>
+  </main>
+
+  <script>
+    let chart = null;
+
+    function readFeature(id, name) {
+      const el = document.getElementById(id);
+      const raw = el.value.trim();
+      if (!raw) {
+        throw new Error(`Please enter a value for "${name}".`);
+      }
+      const n = Number(raw);
+      if (Number.isNaN(n)) {
+        throw new Error(`"${name}" must be a number (got "${raw}").`);
+      }
+      return n;
+    }
+
+    function buildFeaturesArray() {
+      // MUST be in the exact order the model expects
+      return [
+        readFeature("f_adenomyosis", "Adenomyosis"),
+        readFeature("f_endometriosis", "Endometriosis"),
+        readFeature("f_fibroids", "Fibroids"),
+        readFeature("f_ga", "GA"),
+        readFeature("f_pcos", "PCOS"),
+        readFeature("f_th17", "Th17 (CD4+)"),
+        readFeature("f_th17_ifn_pos", "Th17 (CD4+); IL17+/IFN+"),
+        readFeature("f_th17_ifn_neg", "Th17 (CD4+); IL17+/IFN-"),
+        readFeature("f_treg_ratio", "Th17TregRatio"),
+      ];
+    }
+
+    async function loadFeatureOrder() {
+      const backend = document.getElementById("backendUrl").value.trim();
+      const box = document.getElementById("featureOrderBox");
+      box.textContent = "Loading feature order…";
+
+      try {
+        const resp = await fetch(backend + "/feature_order");
+        if (!resp.ok) {
+          box.textContent = "(feature_order.json not available on backend)";
+          return;
+        }
+        const data = await resp.json();
+        if (data.feature_order) {
+          box.textContent =
+            "Model feature order: " + data.feature_order.join(", ");
+        } else {
+          box.textContent = "(feature_order.json returned no list)";
+        }
+      } catch (err) {
+        box.textContent =
+          "Could not load feature order (" + (err.message || err) + ")";
+      }
+    }
+
+    async function doPredict() {
+      const backend = document.getElementById("backendUrl").value.trim();
+      const responseBox = document.getElementById("responseJson");
+      const summaryBox = document.getElementById("summary");
+      const returnProba = document.getElementById("returnProba").checked;
+
+      responseBox.textContent = "Sending request…";
+      summaryBox.style.display = "none";
+      summaryBox.textContent = "";
+
+      let features;
+      try {
+        features = buildFeaturesArray();
+      } catch (err) {
+        responseBox.textContent = "Input error: " + err.message;
+        return;
+      }
+
+      const payload = {
+        features: features,
+        return_proba: returnProba
+      };
+
+      try {
+        const resp = await fetch(backend + "/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          const txt = await resp.text();
+          responseBox.textContent =
+            "Error " + resp.status + ":\n" + txt;
+          return;
+        }
+
+        const data = await resp.json();
+        responseBox.textContent = JSON.stringify(data, null, 2);
+
+        const cls = data.predicted_class;
+        const probs = data.probabilities || {};
+        const conf = data.confidence || 0;
+
+        const labelMap = {
+          0: "RIF (Recurrent Implantation Failure)",
+          1: "RPL (Recurrent Pregnancy Loss)",
+          2: "Both (RIF & RPL risk)"
+        };
+        const humanLabel = labelMap[cls] || `Class ${cls}`;
+
+        summaryBox.style.display = "block";
+        summaryBox.textContent =
+          `Predicted class: ${cls} – ${humanLabel}\n` +
+          `Confidence: ${(conf * 100).toFixed(1)}%`;
+
+        // probabilities for 0,1,2 (if a class is missing, treat as 0)
+        const cls0 = probs["0"] || 0;
+        const cls1 = probs["1"] || 0;
+        const cls2 = probs["2"] || 0;
+
+        const ctx = document.getElementById("probaChart").getContext("2d");
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["0 – RIF", "1 – RPL", "2 – Both"],
+            datasets: [
+              {
+                label: "Class probability",
+                data: [cls0, cls1, cls2]
+              }
+            ]
+          },
+          options: {
+            scales: {
+              y: {
+                beginAtZero: true,
+                max: 1
+              }
+            }
+          }
+        });
+      } catch (err) {
+        responseBox.textContent =
+          "Request failed: " + (err.message || err);
+      }
+    }
+
+    document.getElementById("predictBtn").addEventListener("click", doPredict);
+    window.addEventListener("load", loadFeatureOrder);
+  </script>
+</body>
+</html>

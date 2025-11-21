@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments 
+.venv/
+**/.venv/
+
+# ML artifacts 
+*.joblib
+*.pth
+artifacts/
+
+# Large local datasets
+*.xlsx
+*.csv
+
+# VS Code settings
+.vscode/
+
+# Logs / OS stuff
+*.log
+Thumbs.db
