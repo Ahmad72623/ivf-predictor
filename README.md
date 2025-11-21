@@ -10,7 +10,7 @@ python -m venv .venv
 
 #Install backend dependencies
 cd backend
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 
 #Run the backend
 uvicorn app.main:app --reload
