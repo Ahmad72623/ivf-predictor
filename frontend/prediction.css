@@ -1,0 +1,180 @@
+/* ===============================
+   BASE STYLES (DESKTOP)
+================================= */
+
+body {
+    background: #f7f9fc;
+    font-family: Arial, sans-serif;
+}
+
+/* NAVBAR */
+.custom-red {
+    background-color: #6D0E1E !important;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* Sidebar links */
+.offcanvas a.nav-link {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+.offcanvas a.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* HEADER */
+.predict-header {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.predict-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #6D0E1E;
+}
+
+.predict-header p {
+    font-size: 18px;
+    color: #555;
+}
+
+/* INPUT SECTION */
+.input-section {
+    margin-top: 40px;
+    margin-bottom: 60px;
+}
+
+.input-section h2 {
+    font-size: 28px;
+    color: #6D0E1E;
+    font-weight: 700;
+}
+
+.sub-text {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+/* Button */
+.predict-btn {
+    background-color: #6D0E1E;
+    color: white;
+    padding: 12px 26px;
+    font-size: 18px;
+    border-radius: 6px;
+    border: none;
+}
+
+.predict-btn:hover {
+    background-color: #520A14;
+}
+
+/* RESULTS SECTION */
+.results-section {
+    margin-top: 50px;
+    margin-bottom: 70px;
+    padding-bottom: 30px;
+}
+
+.results-title {
+    font-size: 28px;
+    color: #6D0E1E;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+.raw-title {
+    margin-top: 40px;
+    color: #6D0E1E;
+    font-weight: 700;
+}
+
+
+/* =======================================
+   MOBILE RESPONSIVENESS OPTIMIZATION
+========================================== */
+@media (max-width: 768px) {
+
+    /* HEADER */
+    .predict-header {
+        padding: 35px 15px;
+    }
+
+    .predict-header h1 {
+        font-size: 30px;
+    }
+
+    .predict-header p {
+        font-size: 15px;
+        padding: 0 10px;
+    }
+
+    /* INPUT SECTION */
+    .input-section {
+        margin-top: 30px;
+    }
+
+    .input-section h2 {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    .sub-text {
+        text-align: center;
+        font-size: 15px;
+        padding: 0 10px;
+    }
+
+    .form-label {
+        font-size: 15px;
+    }
+
+    .form-control {
+        font-size: 15px;
+        padding: 8px 10px;
+    }
+
+    /* Button */
+    .predict-btn {
+        width: 100%;
+        font-size: 17px;
+        padding: 12px 0;
+        margin-top: 15px;
+    }
+
+    /* RESULTS SECTION */
+    .results-title {
+        font-size: 22px;
+        text-align: center;
+    }
+
+    #probaChart {
+        max-height: 250px;
+    }
+
+    .raw-title {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    #responseJson {
+        font-size: 14px;
+        padding: 10px;
+        white-space: pre-wrap;
+    }
+
+    /* NAV STYLING */
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .offcanvas a.nav-link {
+        font-size: 17px;
+        margin-bottom: 8px;
+    }
+}

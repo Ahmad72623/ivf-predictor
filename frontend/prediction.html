@@ -1,110 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>IVF Predictor – Random Forest</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8" />
+    <title>IVF Predictor – Clinical Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Chart.js for probability bar chart -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Bootstrap -->
+    <link 
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" 
+        rel="stylesheet"
+    >
 
-  <!-- External CSS -->
-  <link rel="stylesheet" href="styles.css" />
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="prediction.css" />
 </head>
+
 <body>
-  <header>
-    <h1>IVF Predictor – Random Forest (Local)</h1>
-  </header>
 
-  <main>
-    <section>
-      <label for="backendUrl">Backend URL</label>
-      <input
-        type="text"
-        id="backendUrl"
-        value="http://127.0.0.1:8000"
-      />
-      <div id="featureOrderBox"></div>
-
-      <h2>Input features (normalized)</h2>
-      <small>
-        Class mapping: <b>0 = RIF</b>, <b>1 = RPL</b>, <b>2 = Both</b>.
-      </small>
-
-      <div class="grid">
-        <div>
-          <label for="f_adenomyosis">1. Adenomyosis (0 = N, 1 = Y)</label>
-          <input id="f_adenomyosis" type="text" placeholder="e.g., 0 or 1" />
+    <!-- ================================
+         LEFT SIDEBAR NAVIGATION
+    ================================= -->
+    <div class="offcanvas offcanvas-start custom-red text-white" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Navigation</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
         </div>
 
-        <div>
-          <label for="f_endometriosis">2. Endometriosis (0 = N, 1 = Y)</label>
-          <input id="f_endometriosis" type="text" placeholder="e.g., 0 or 1" />
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="prediction.html">Prediction Tool</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="about.html">About</a></li>
+                <li class="nav-item"><a class="nav-link text-white" href="contact.html">Contact</a></li>
+            </ul>
         </div>
+    </div>
 
-        <div>
-          <label for="f_fibroids">3. Fibroids (0 = N, 1 = Y)</label>
-          <input id="f_fibroids" type="text" placeholder="e.g., 0 or 1" />
+    <!-- ================================
+         TOP NAVBAR
+    ================================= -->
+    <nav class="navbar navbar-dark custom-red">
+        <div class="container-fluid">
+
+            <!-- Hamburger triggers left sidebar -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand fw-bold ms-2" href="index.html">IVF Predictor</a>
         </div>
+    </nav>
 
-        <div>
-          <label for="f_ga">4. GA (normalized)</label>
-          <input id="f_ga" type="text" placeholder="e.g., -0.8" />
-          <small>Use normalized GA (z-score) from your dataset.</small>
-        </div>
 
-        <div>
-          <label for="f_pcos">5. PCOS (0 = N, 1 = Y)</label>
-          <input id="f_pcos" type="text" placeholder="e.g., 0 or 1" />
-        </div>
+    <!-- ================================
+         HEADER
+    ================================= -->
+    <header class="predict-header">
+        <h1>IVF Prediction Tool</h1>
+        <p>
+            Enter patient clinical & immunological values to generate an AI-based prediction 
+            for RIF, RPL, or Combined outcomes.
+        </p>
+    </header>
 
-        <div>
-          <label for="f_th17">6. Th17 (CD4+)</label>
-          <input id="f_th17" type="text" placeholder="e.g., -0.4" />
-        </div>
 
-        <div>
-          <label for="f_th17_ifn_pos">7. Th17 (CD4+); IL17+/IFN+</label>
-          <input id="f_th17_ifn_pos" type="text" placeholder="e.g., -0.5" />
-        </div>
+    <!-- ================================
+         MAIN CONTAINER
+    ================================= -->
+    <main class="container">
 
-        <div>
-          <label for="f_th17_ifn_neg">8. Th17 (CD4+); IL17+/IFN-</label>
-          <input id="f_th17_ifn_neg" type="text" placeholder="e.g., -0.6" />
-        </div>
+        <!-- ============================
+             INPUT FORM
+        ============================= -->
+        <section class="input-section">
 
-        <div>
-          <label for="f_treg_ratio">9. Th17TregRatio</label>
-          <input id="f_treg_ratio" type="text" placeholder="e.g., -0.7" />
-        </div>
-      </div>
+            <h2>Patient Inputs</h2>
+            <p class="sub-text">Values should be encoded (0/1) or normalized based on your clinic workflow.</p>
 
-      <div class="row">
-        <div>
-          <label>
-            <input type="checkbox" id="returnProba" checked />
-            return_proba
-          </label>
-        </div>
-        <div>
-          <button id="predictBtn">Predict</button>
-        </div>
-      </div>
-    </section>
+            <div class="row g-4">
 
-    <section id="summary" style="display:none;"></section>
+                <div class="col-md-4">
+                    <label class="form-label">Adenomyosis (0/1)</label>
+                    <input id="f_adenomyosis" class="form-control">
+                </div>
 
-    <section>
-      <canvas id="probaChart"></canvas>
-    </section>
+                <div class="col-md-4">
+                    <label class="form-label">Endometriosis (0/1)</label>
+                    <input id="f_endometriosis" class="form-control">
+                </div>
 
-    <section>
-      <h3>Raw Response</h3>
-      <pre id="responseJson">{}</pre>
-    </section>
-  </main>
+                <div class="col-md-4">
+                    <label class="form-label">Fibroids (0/1)</label>
+                    <input id="f_fibroids" class="form-control">
+                </div>
 
-  <!-- External JS -->
-  <script src="script.js"></script>
+                <div class="col-md-4">
+                    <label class="form-label">GA (normalized)</label>
+                    <input id="f_ga" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">PCOS (0/1)</label>
+                    <input id="f_pcos" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Th17 (CD4+)</label>
+                    <input id="f_th17" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Th17 IL17+/IFN+</label>
+                    <input id="f_th17_ifn_pos" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Th17 IL17+/IFN-</label>
+                    <input id="f_th17_ifn_neg" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Th17/Treg Ratio</label>
+                    <input id="f_treg_ratio" class="form-control">
+                </div>
+
+                <!-- Checkbox -->
+                <div class="col-12 checkbox-row mt-2">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="returnProba" checked />
+                        <span>Return Probabilities</span>
+                    </label>
+                </div>
+
+            </div>
+
+            <button id="predictBtn" class="btn predict-btn mt-4">Predict Outcome</button>
+
+        </section>
+
+
+        <!-- ============================
+             RESULTS (HIDDEN UNTIL READY)
+        ============================= -->
+        <section id="resultsSection" class="results-section" style="display:none;">
+            
+            <h2 class="results-title">Prediction Probabilities</h2>
+
+            <canvas id="probaChart"></canvas>
+
+            <h3 class="raw-title">Raw Response</h3>
+            <pre id="responseJson">{}</pre>
+
+        </section>
+
+    </main>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Your script -->
+    <script src="script.js"></script>
+
 </body>
 </html>

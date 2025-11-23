@@ -1,0 +1,30 @@
+body {
+    background: #fafafa;
+    font-family: Arial, sans-serif;
+}
+
+.custom-red {
+    background-color: #6D0E1E;
+}
+
+.contact-header {
+    background-color: #6D0E1E;
+    color: white;
+    text-align: center;
+    padding: 60px 0;
+}
+
+.contact-section {
+    margin-top: 40px;
+    padding-bottom: 40px;
+}
+
+.contact-btn {
+    background-color: #6D0E1E;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 6px;
+}
+.contact-btn:hover {
+    background-color: #520A17;
+}

@@ -1,0 +1,28 @@
+body {
+    background: #fafafa;
+    font-family: Arial, sans-serif;
+}
+
+/* Navbar */
+.custom-red {
+    background-color: #6D0E1E;
+}
+
+/* Header */
+.about-header {
+    background-color: #6D0E1E;
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+/* About Section */
+.about-section {
+    margin-top: 40px;
+    padding-bottom: 40px;
+}
+
+.about-section h2 {
+    color: #6D0E1E;
+    margin-top: 30px;
+}
