@@ -142,19 +142,45 @@
         </section>
 
 
-        <!-- ============================
-             RESULTS (HIDDEN UNTIL READY)
-        ============================= -->
-        <section id="resultsSection" class="results-section" style="display:none;">
-            
-            <h2 class="results-title">Prediction Probabilities</h2>
+     <!-- ============================
+     RESULTS (HIDDEN UNTIL READY)
+============================= -->
+    <section id="resultsSection" class="results-section" style="display:none;">
+    
+    <!-- Title -->
+    <h2 class="results-title">Prediction Probabilities</h2>
 
-            <canvas id="probaChart"></canvas>
+    <!-- Probability Chart -->
+    <canvas id="probaChart"></canvas>
 
-            <h3 class="raw-title">Raw Response</h3>
-            <pre id="responseJson">{}</pre>
+    <!-- ============================
+         DIAGNOSIS SUMMARY CARD
+    ============================= -->
+    <div id="diagnosisCard" class="diagnosis-card" style="display:none;">
+        <h3 class="diag-title">Diagnosis Summary</h3>
 
-        </section>
+        <div class="diag-item">
+            <span class="diag-label">Predicted Outcome:</span>
+            <span id="diagOutcome" class="diag-value"></span>
+        </div>
+
+        <div class="diag-item">
+            <span class="diag-label">Confidence:</span>
+            <span id="diagConfidence" class="diag-value"></span>
+        </div>
+
+        <div class="diag-item">
+            <span class="diag-label">Clinical Notes:</span>
+            <p id="diagNotes" class="diag-notes"></p>
+        </div>
+    </div>
+
+    <!-- Raw JSON -->
+    <h3 class="raw-title">Raw Response</h3>
+    <pre id="responseJson">{}</pre>
+
+    </section>
+
 
     </main>
 
