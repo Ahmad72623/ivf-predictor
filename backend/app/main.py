@@ -74,7 +74,7 @@ app = FastAPI(title="IVF Predictor – Random Forest Only")
 # Allow your static frontend / future hosting to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # you can tighten this later
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
